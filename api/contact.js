@@ -1,7 +1,7 @@
 // api/contact.js - Vercel Serverless Function
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Set CORS headers
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -53,14 +53,23 @@ export default async function handler(req, res) {
       });
     }
 
+    // Debug: Log environment variables
+    console.log("Environment variables status:", {
+      SMTP_HOST: process.env.SMTP_HOST ? "SET" : "NOT SET",
+      SMTP_PORT: process.env.SMTP_PORT ? "SET" : "NOT SET",
+      SMTP_USER: process.env.SMTP_USER ? "SET" : "NOT SET",
+      SMTP_PASS: process.env.SMTP_PASS ? "SET" : "NOT SET",
+      ADMIN_EMAIL: process.env.ADMIN_EMAIL ? "SET" : "NOT SET",
+    });
+
     // Create transporter using environment variables
     const transporter = nodemailer.createTransporter({
       host: process.env.SMTP_HOST || "smtp.gmail.com",
       port: process.env.SMTP_PORT || 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.SMTP_USER, // Your email
-        pass: process.env.SMTP_PASS, // Your app password
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
     });
 
@@ -90,37 +99,37 @@ export default async function handler(req, res) {
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="header">
+        <div class='container'>
+            <div class='header'>
                 <h2>🚀 New Enquiry - Krishna Kavach Engineering</h2>
             </div>
-            <div class="content">
-                <div class="field">
-                    <div class="label">Name:</div>
-                    <div class="value">${name}</div>
+            <div class='content'>
+                <div class='field'>
+                    <div class='label'>Name:</div>
+                    <div class='value'>${name}</div>
                 </div>
-                <div class="field">
-                    <div class="label">Email:</div>
-                    <div class="value">${email}</div>
+                <div class='field'>
+                    <div class='label'>Email:</div>
+                    <div class='value'>${email}</div>
                 </div>
-                <div class="field">
-                    <div class="label">Phone:</div>
-                    <div class="value">${phone}</div>
+                <div class='field'>
+                    <div class='label'>Phone:</div>
+                    <div class='value'>${phone}</div>
                 </div>
-                <div class="field">
-                    <div class="label">Company:</div>
-                    <div class="value">${company || "Not provided"}</div>
+                <div class='field'>
+                    <div class='label'>Company:</div>
+                    <div class='value'>${company || "Not provided"}</div>
                 </div>
-                <div class="field">
-                    <div class="label">Products Interested In:</div>
-                    <div class="value">${productsList}</div>
+                <div class='field'>
+                    <div class='label'>Products Interested In:</div>
+                    <div class='value'>${productsList}</div>
                 </div>
-                <div class="field">
-                    <div class="label">Message:</div>
-                    <div class="value">${message || "No message provided"}</div>
+                <div class='field'>
+                    <div class='label'>Message:</div>
+                    <div class='value'>${message || "No message provided"}</div>
                 </div>
             </div>
-            <div class="footer">
+            <div class='footer'>
                 <p>This enquiry was submitted from the Krishna Kavach website on ${new Date().toLocaleString()}</p>
                 <p>🌟 Something magical is launching soon! 🌟</p>
             </div>
@@ -129,32 +138,12 @@ export default async function handler(req, res) {
     </html>
     `;
 
-    // Plain text version
-    const textContent = `
-NEW ENQUIRY - Krishna Kavach Engineering
-=====================================
-
-Name: ${name}
-Email: ${email}
-Phone: ${phone}
-Company: ${company || "Not provided"}
-Products Interested In: ${productsList}
-
-Message:
-${message || "No message provided"}
-
-=====================================
-Submitted: ${new Date().toLocaleString()}
-🚀 Something magical is launching soon!
-    `;
-
     // Email options
     const mailOptions = {
       from: `"Krishna Kavach Website" <${process.env.SMTP_USER}>`,
       to: process.env.ADMIN_EMAIL || "admin@krishnakavach.com",
       replyTo: email,
       subject: subject,
-      text: textContent,
       html: htmlContent,
     };
 
@@ -172,15 +161,6 @@ Submitted: ${new Date().toLocaleString()}
       code: error.code,
       response: error.response,
       command: error.command,
-    });
-
-    // Check environment variables
-    console.log("Environment variables status:", {
-      SMTP_HOST: process.env.SMTP_HOST ? "SET" : "NOT SET",
-      SMTP_PORT: process.env.SMTP_PORT ? "SET" : "NOT SET",
-      SMTP_USER: process.env.SMTP_USER ? "SET" : "NOT SET",
-      SMTP_PASS: process.env.SMTP_PASS ? "SET" : "NOT SET",
-      ADMIN_EMAIL: process.env.ADMIN_EMAIL ? "SET" : "NOT SET",
     });
 
     // Log the enquiry as backup
@@ -201,4 +181,4 @@ Submitted: ${new Date().toLocaleString()}
       debug: error.message, // Temporary - remove in production
     });
   }
-}
+};
