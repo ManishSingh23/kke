@@ -126,7 +126,14 @@ module.exports = async function handler(req, res) {
       html: htmlContent,
     };
 
-    await transporter.sendMail(mailOptions);
+    await transporter
+      .sendMail(mailOptions)
+      .then((info) => {
+        console.log("Email sent:", info);
+      })
+      .catch((err) => {
+        console.error("SendMail error:", err);
+      });
 
     res.status(200).json({
       success: true,
